@@ -28,10 +28,10 @@ const statusUpdate = () => {
       }
       guildStatus[member.status as 'online' | 'idle' | 'dnd' | 'offline']++
     })
-    dd.gauge(`members_${guild.id}.online`, status.online)
-    dd.gauge(`members_${guild.id}.idle`, status.idle)
-    dd.gauge(`members_${guild.id}.dnd`, status.dnd)
-    dd.gauge(`members_${guild.id}.offline`, status.offline)
+    dd.gauge(`members_${guild.id}.online`, guildStatus.online)
+    dd.gauge(`members_${guild.id}.idle`, guildStatus.idle)
+    dd.gauge(`members_${guild.id}.dnd`, guildStatus.dnd)
+    dd.gauge(`members_${guild.id}.offline`, guildStatus.offline)
   })
 
   dd.gauge('users.online', status.online)
