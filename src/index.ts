@@ -1,4 +1,4 @@
-import { CommandClient, Message, GuildChannel } from 'eris'
+import { CommandClient, Message, GuildChannel, VoiceChannel } from 'eris'
 import dd from 'datadog-metrics'
 import emoji from 'node-emoji'
 
@@ -39,6 +39,19 @@ const statusUpdate = () => {
   dd.gauge('users.idle', status.idle)
   dd.gauge('users.dnd', status.dnd)
   dd.gauge('users.offline', status.offline)
+}
+
+const voiceUpdate = () => {
+  bot.guilds.forEach(guild => {
+    guild.channels.forEach(channel => {
+      if (channel.type === 2) {
+        dd.gauge('voice.members', (channel as VoiceChannel).voiceMembers.size, [
+          `guild:${guild.id}`,
+          `channel:${channel.id}`
+        ])
+      }
+    })
+  })
 }
 
 const bot = new CommandClient(process.env.TOKEN)
@@ -161,6 +174,46 @@ bot.on('messageReactionRemove', (msg, e, u) => {
   dd.increment(`reactions.remove`, 1, tags)
 })
 
+bot.on('voiceChannelJoin', (member, channel) => {
+  console.log(`[INFO] Member joined ${channel.id}`)
+  voiceUpdate()
+  const tags = [
+    `channel:${channel.id}`,
+    `user:${member.id}`
+  ]
+  if ((channel as GuildChannel).guild !== undefined) {
+    tags.push(`guild:${(channel as GuildChannel).guild.id}`)
+  }
+  dd.increment(`voice.joins`, 1, tags)
+})
+
+bot.on('voiceChannelSwitch', (member, newChannel, oldChannel) => {
+  console.log(`[INFO] Member move from ${oldChannel.id} to ${newChannel.id}`)
+  voiceUpdate()
+  const tags = [
+    `new-channel:${newChannel.id}`,
+    `old-channel:${oldChannel.id}`,
+    `user:${member.id}`
+  ]
+  if ((newChannel as GuildChannel).guild !== undefined) {
+    tags.push(`guild:${(newChannel as GuildChannel).guild.id}`)
+  }
+  dd.increment(`voice.switch`, 1, tags)
+})
+
+bot.on('voiceChannelLeave', (member, channel) => {
+  console.log(`[INFO] Member left ${channel.id}`)
+  voiceUpdate()
+  const tags = [
+    `channel:${channel.id}`,
+    `user:${member.id}`
+  ]
+  if ((channel as GuildChannel).guild !== undefined) {
+    tags.push(`guild:${(channel as GuildChannel).guild.id}`)
+  }
+  dd.increment(`voice.leaves`, 1, tags)
+})
+
 bot.on('ready', () => {
   console.log(`[INFO] Connected to discord as ${bot.user.username}#${bot.user.discriminator}`)
 })
@@ -176,6 +229,8 @@ process.on('SIGTERM', () => {
 setInterval(() => {
   console.log('[INFO] Collecting user status')
   statusUpdate()
+  console.log('[INFO] Collecting voice members')
+  voiceUpdate()
 }, 60000)
 
 bot.connect()
