@@ -4,6 +4,7 @@ services:
     build: .
     restart: on-failure
     environment:
-      - TOKEN=
-      - DATADOG_KEY=
+      TOKEN:
+      DATADOG_KEY:
+      DATADOG_PREFIX:
 
