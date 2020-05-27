@@ -3,9 +3,6 @@ import dd from 'datadog-metrics'
 import emoji from 'node-emoji'
 
 const statusUpdate = () => {
-  if (!(bot as any).ready) {
-    return
-  }
   let status = {
     online: 0,
     idle: 0,
@@ -230,11 +227,14 @@ process.on('SIGTERM', () => {
 })
 
 setInterval(() => {
+  if (!(bot as any).ready) {
+    return
+  }
   console.log('[INFO] Collecting user status')
   statusUpdate()
   console.log('[INFO] Collecting voice members')
   voiceUpdate()
-}, 1000)
+}, 3000)
 
 bot.connect()
   .catch(console.error)
