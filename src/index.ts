@@ -215,7 +215,15 @@ bot.on('voiceChannelLeave', (member, channel) => {
 })
 
 bot.on('ready', () => {
-  console.log(`[INFO] Connected to discord as ${bot.user.username}#${bot.user.discriminator}`)
+  console.log(`[INFO] Ready, logged in to Discord as ${bot.user.username}#${bot.user.discriminator}`)
+})
+
+bot.on('disconnect', () => {
+  console.log('Disconnnected, reconnecting...')
+})
+
+bot.on('connect', () => {
+  console.log('Connected')
 })
 
 process.on('SIGTERM', () => {
