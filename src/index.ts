@@ -129,11 +129,6 @@ bot.on('guildMemberRemove', (guild, user) => {
   ])
 })
 
-bot.on('presenceUpdate', () => {
-  console.log(`[INFO] Collecting user status.`)
-  statusUpdate()
-})
-
 bot.on('messageReactionAdd', (msg, e, u) => {
   console.log(`[INFO] Reaction added on ${msg.id}`)
   const tags = [
@@ -239,7 +234,7 @@ setInterval(() => {
   statusUpdate()
   console.log('[INFO] Collecting voice members')
   voiceUpdate()
-}, 60000)
+}, 1000)
 
 bot.connect()
   .catch(console.error)
