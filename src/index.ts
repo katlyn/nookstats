@@ -1,4 +1,4 @@
-import { CommandClient, Message, GuildChannel, VoiceChannel } from 'eris'
+import { Client, Message, GuildChannel, VoiceChannel } from 'eris'
 import dd from 'datadog-metrics'
 import emoji from 'node-emoji'
 
@@ -51,7 +51,16 @@ const voiceUpdate = () => {
   })
 }
 
-const bot = new CommandClient(process.env.TOKEN)
+const bot = new Client(process.env.TOKEN, {
+  intents: [
+    'guilds',
+    'guildMembers',
+    'guildVoiceStates',
+    'guildPresences',
+    'guildMessages',
+    'guildMessageReactions'
+  ]
+})
 dd.init({
   prefix: process.env.DATADOG_PREFIX,
   apiKey: process.env.DATADOG_KEY,
@@ -99,6 +108,7 @@ bot.on('messageDelete', msg => {
   const tags = [
     `channel:${msg.channel.id}`,
     `msg:${msg.id}`,
+    // @ts-expect-error
     `chan-type:${msg.channel.type}`
   ]
   if ((msg as Message).author !== undefined) {
@@ -132,6 +142,7 @@ bot.on('messageReactionAdd', (msg, e, u) => {
     `channel:${msg.channel.id}`,
     `user:${u}`,
     `msg:${msg.id}`,
+    // @ts-expect-error
     `chan-type:${msg.channel.type}`
   ]
   if (e.id === null) {
@@ -152,6 +163,7 @@ bot.on('messageReactionRemove', (msg, e, u) => {
     `channel:${msg.channel.id}`,
     `user:${u}`,
     `msg:${msg.id}`,
+    // @ts-expect-error
     `chan-type:${msg.channel.type}`
   ]
   if (e.id === null) {
