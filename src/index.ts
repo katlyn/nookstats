@@ -30,6 +30,7 @@ const statusUpdate = () => {
     dd.gauge(`members.idle`, guildStatus.idle, [ `guild:${guild.id}` ])
     dd.gauge(`members.dnd`, guildStatus.dnd, [ `guild:${guild.id}` ])
     dd.gauge(`members.offline`, guildStatus.offline, [ `guild:${guild.id}` ])
+    dd.gauge(`members.total`, guild.memberCount, [ `guild:${guild.id}` ])
   })
 
   dd.gauge('users.online', status.online)
@@ -59,7 +60,8 @@ const bot = new Client(process.env.TOKEN, {
     'guildPresences',
     'guildMessages',
     'guildMessageReactions'
-  ]
+  ],
+  getAllUsers: true
 })
 dd.init({
   prefix: process.env.DATADOG_PREFIX,
